@@ -1,6 +1,6 @@
 # Overview
 ## Objective
-Application that facilitates the tracking, management, and resolution of software bugs and issues within a development environemnet.
+Create an application that facilitates the tracking, management, and resolution of software bugs and issues within a development environemnet.
 
 ## Scope
 The Bug Tracker is a web based application that allows users to report, track, and manage software defects throughout the software development lifecycle. It will provide a centralized collaboration environment among teams, testers, and stakeholders.
