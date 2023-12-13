@@ -1,30 +1,27 @@
-import {useForm} from '@mantine/form'
-
-import { FormEvent } from 'react'
-import LoginFormView from './Login.form.view'
-import { getRandomValues } from 'crypto'
-export default function LoginFormController ({children}: any) {
+import { useForm, zodResolver } from '@mantine/form';
+import AuthController from '@/api/auth/auth.controller';
+import { FormEvent } from 'react';
+import LoginFormView from './Login.form.view';
+import { LoginSchema } from '@/api/auth/schema';
+export default function LoginFormController({ children }: any) {
   const form = useForm({
-    initialValues:{
+    initialValues: {
       email: '',
       password: '',
     },
-    // validate: {
-    //   email: (value) => (/^\S+@\S+$/.test(value) ? null : 'Invalid email'),
-    // }
-  })
+    validate: zodResolver(LoginSchema),
+  });
 
-  const handleSubmit = (e: FormEvent) => {
-    e.preventDefault()
-    // if (!form.isValid())  {
-    //   form.validate()
-    //   return
-    // }
-  }
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    const res = await new AuthController().login(form.values);
+    if (!res) throw new Error('Server Error');
+    if (res.error) alert('Invalid Credentials');
+  };
 
   return (
     <form onSubmit={handleSubmit}>
-      <LoginFormView form={form}/>
+      <LoginFormView form={form} />
     </form>
-  )
+  );
 }

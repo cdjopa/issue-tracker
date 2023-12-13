@@ -4,7 +4,7 @@ import classes from './index.module.css';
 export default function RegisterPage() {
   return (
     <div className={classes.wrapper}>
-      <Register/>
+      <Register />
     </div>
-  )
+  );
 }
