@@ -9,7 +9,7 @@ export default function RegisterFormView({ form }: any) {
     <>
       <TextInput
         label="Email address"
-        placeholder="hello@gmail.com"
+        placeholder="user@gmail.com"
         size="md"
         {...form.getInputProps('email')}
       />
