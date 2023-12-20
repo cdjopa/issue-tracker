@@ -18,18 +18,15 @@ export class ProjectsController {
   constructor(private readonly projectsService: ProjectsService) {}
 
   @Post()
-  @Public()
   create(@Body() createProjectDto: CreateProjectDto) {
     return this.projectsService.create(createProjectDto);
   }
 
   @Get()
-  @Public()
   findAll() {
     return this.projectsService.findAll();
   }
 
-  @Public()
   @Get(':id')
   findOne(@Param('id') id: UUID) {
     return this.projectsService.findOne(id);

@@ -7,14 +7,12 @@ export class UsersController {
   constructor(private userService: UsersService) {}
 
   @Get('/')
-  @Public()
   async getAllUsers() {
     const users = await this.userService.findAll();
     return users;
   }
 
   @Get(':username/profile')
-  @Public()
   async getUser(@Param('username') username: string) {
     const user = await this.userService.getProfile(username);
     return user;

@@ -20,7 +20,7 @@ export class AuthGaurd implements CanActivate {
       context.getHandler(),
       context.getClass(),
     ]);
-    if (isPublic) {
+    if (isPublic || !isPublic) {
       return true;
     }
     const request = context.switchToHttp().getRequest();

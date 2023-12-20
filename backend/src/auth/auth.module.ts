@@ -6,7 +6,6 @@ import { JwtModule } from '@nestjs/jwt';
 import { AuthGaurd } from './guards/auth.guard';
 import { APP_GUARD } from '@nestjs/core';
 
-console.log(process.env.jwtSecretKey);
 @Module({
   imports: [UsersModule, JwtModule],
   controllers: [AuthController],
