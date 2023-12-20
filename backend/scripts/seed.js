@@ -1,6 +1,7 @@
 const { users } = require('../src/data/user.placeholder.js');
 const bcrypt = require('bcrypt');
-const { pool } = require('./db.js')
+const { pool } = require('./db.js');
+const { error } = require('console');
 
 
 async function installExtensions() {
@@ -31,6 +32,23 @@ async function createUsersTable() {
     throw new Error(error)
   }
   // console.log(`created table ${rows.length ? false : true}`)
+}
+
+async function createUsersProjectsTable() {
+  try {
+    await pool.query(
+      `
+    CREATE TABLE IF NOT EXISTS users_projects (
+      user_id UUID NOT NULL,
+      project_id UUID NOT NULL,
+      PRIMARY KEY (user_id, project_id)
+    )
+    `
+    )
+  } catch (error) {
+    console.error('Error creating users_projects table')
+    throw new Error(error)
+  }
 }
 
 async function createProjectsTable() {

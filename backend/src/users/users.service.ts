@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { User } from './entities/user.entity';
 import { Profile } from './entities/profile.entity';
 import { pool } from 'src/db';
+import { Project } from 'src/projects/entities/project.entity';
 
 @Injectable()
 export class UsersService {
@@ -52,5 +53,24 @@ export class UsersService {
       ...userProfile
     } = user;
     return userProfile;
+  }
+
+  async findProjects(id: string): Promise<Project[]> {
+    try {
+      const { rows } = await pool.query(
+        `
+        SELECT projects.*
+        FROM users
+        JOIN users_projects ON users.id = users_projects.user_id
+        JOIN projects ON users_projects.project_id = projects. id
+        WHERE users.id = $1
+        `,
+        [id],
+      );
+      return rows;
+    } catch (error) {
+      console.log('Error getting user projects');
+      throw new Error(error);
+    }
   }
 }

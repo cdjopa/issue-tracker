@@ -9,6 +9,7 @@ async function dropAllTables() {
       `
     DROP TABLE IF EXISTS users CASCADE;
     DROP TABLE IF EXISTS projects CASCADE;
+    DROP TABLE IF EXISTS users_projects CASCADE;
     `
     )
   } catch (error) {

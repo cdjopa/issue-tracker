@@ -1,6 +1,8 @@
 import { Controller, Get, Param } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { Public } from 'src/metadata';
+import { UUID } from 'crypto';
+import { FindProjectsDto } from './dto/find-by.dto';
 
 @Controller('users')
 export class UsersController {
@@ -16,5 +18,13 @@ export class UsersController {
   async getUser(@Param('username') username: string) {
     const user = await this.userService.getProfile(username);
     return user;
+  }
+
+  @Get(':user_id/projects')
+  async getUserProjects(@Param() params: FindProjectsDto) {
+    // TODO:
+    // use user session to get id instead of passing in as param
+    const projects = await this.userService.findProjects(params.user_id);
+    return projects;
   }
 }
