@@ -11,10 +11,7 @@ import {
 import { ProjectsService } from './projects.service';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
-import { Public } from 'src/metadata';
-import { ProjectSearchParams } from './dto/param.dto';
 import { UpdateProjectUsersDto } from './dto/project-users.dto';
-import { UUID } from 'crypto';
 
 @Controller('projects')
 export class ProjectsController {

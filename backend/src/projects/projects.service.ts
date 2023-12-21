@@ -1,7 +1,7 @@
-import { ConsoleLogger, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
-import { UUID, getRandomValues } from 'crypto';
+import { UUID } from 'crypto';
 import { pool } from 'src/db';
 import { Project } from './entities/project.entity';
 
