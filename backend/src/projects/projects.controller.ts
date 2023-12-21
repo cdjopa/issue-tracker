@@ -14,6 +14,7 @@ import { UpdateProjectDto } from './dto/update-project.dto';
 import { Public } from 'src/metadata';
 import { ProjectSearchParams } from './dto/param.dto';
 import { UpdateProjectUsersDto } from './dto/project-users.dto';
+import { UUID } from 'crypto';
 
 @Controller('projects')
 export class ProjectsController {
@@ -56,7 +57,7 @@ export class ProjectsController {
     @Param('project_id', new ParseUUIDPipe({ version: '4' }))
     project_id: string,
   ) {
-    return await this.projectsService.getUsers(project_id)
+    return await this.projectsService.findUsers(project_id);
   }
 
   @Post(':project_id/users')
@@ -83,6 +84,5 @@ export class ProjectsController {
       project_id,
       projectUsersDto.users,
     );
-    return;
   }
 }

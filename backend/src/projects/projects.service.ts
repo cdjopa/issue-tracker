@@ -59,8 +59,6 @@ export class ProjectsService {
   }
 
   async update(project_id: string, updateProjectDto: UpdateProjectDto) {
-    const { name, summary, target_end_date, actual_end_date } =
-      updateProjectDto;
     try {
       const updateFields = Object.keys(updateProjectDto)
         .map((key, idx) => {
@@ -99,7 +97,7 @@ export class ProjectsService {
       throw new Error(error);
     }
   }
-  async getUsers(project_id: string) {
+  async findUsers(project_id: string): Promise<UUID[]> {
     const { rows } = await pool.query(
       `
     SELECT user_id FROM users_projects WHERE project_id = $1
@@ -109,7 +107,7 @@ export class ProjectsService {
     return rows.map((values) => values.user_id);
   }
 
-  async addUsers(project_id: string, users: string[]) {
+  async addUsers(project_id: string, users: string[]): Promise<UUID[]> {
     // create client to allow use of transaction
     const client = await pool.connect();
     try {
@@ -144,14 +142,14 @@ export class ProjectsService {
       client.release();
     }
   }
-  async removeUsers(project_id: string, users: string[]) {
+  async removeUsers(project_id: string, users: string[]): Promise<UUID[]> {
     // create client to allow use of transaction
     const client = await pool.connect();
     try {
       // start postgres transaction
       await client.query('BEGIN');
       const inserted = await Promise.all(
-        // for every requested user, try inserting into the project
+        // for every requested user, try deleting from the project
         await users.map(async (user_id) => {
           const { rows } = await client.query(
             `DELETE FROM users_projects 
@@ -160,11 +158,11 @@ export class ProjectsService {
              `,
             [user_id, project_id],
           );
-          // return all successful inserts
+          // return all successful deletions
           return rows[0];
         }),
       );
-      // reformat result to return array of successful insert user UUID
+      // reformat result to return array of successful deletion user UUID
       await client.query('COMMIT');
       return inserted
         .filter((values) => values && values.user_id)
