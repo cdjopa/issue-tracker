@@ -7,7 +7,7 @@ import {
 } from 'class-validator';
 
 export class Issue {
-  @IsUUID('4')
+  @IsString()
   id: string;
 
   @IsString()

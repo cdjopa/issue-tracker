@@ -5,7 +5,7 @@ export class CreateProjectDto {
   name: string;
 
   @IsString()
-  label: string;
+  project_key: string;
 
   @IsString()
   summary: string;

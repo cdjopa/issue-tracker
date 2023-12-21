@@ -51,21 +51,49 @@ async function createUsersProjectsTable() {
   }
 }
 
+async function createIssuesTable() {
+  try {
+    await pool.query(
+      `
+      CREATE TABLE IF NOT EXISTS issues (
+    id UUID DEFAULT uuid_generate_v4() NOT NULL PRIMARY KEY,
+    issue_key TEXT NOT NULL,
+    summary TEXT NOT NULL,
+    descrpition TEXT,
+    identified_date TEXT NOT NULL,
+    related_project UUID NOT NULL REFERENCES projects(id),
+    assigned_to UUID REFERENCES users(id),
+    priority TEXT,
+    issue_type TEXT,
+    target_resolution_date TEXT,
+    actual_resolution_date TEXT,
+    resolution_summary TEXT,
+    created_on TEXT NOT NULL,
+    created_by UUID NOT NULL references users(id)
+      );
+      `
+    )
+  } catch (error) {
+    console.error('Error creating issues table')
+    throw new Error(error)
+  }
+}
+
 async function createProjectsTable() {
   try {
     await pool.query(
       `
       CREATE TABLE IF NOT EXISTS projects (
-        id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+        id UUID DEFAULT uuid_generate_v4() NOT NULL PRIMARY KEY,
         name TEXT UNIQUE NOT NULL,
-        label TEXT UNIQUE NOT NULL,
+        project_key TEXT NOT NULL,
         summary TEXT UNIQUE NOT NULL,
         start_date TEXT NOT NULL,
         target_end_date TEXT NOT NULL,
         actual_end_date TEXT,
         created_on TEXT NOT NULL,
-        created_by TEXT NOT NULL
-      )
+        created_by UUID NOT NULL
+      );
       `
     )
   } catch (error) {
@@ -127,7 +155,7 @@ async function seedProjects() {
     projects.map(async (project) => {
       const { rows } = await pool.query(`
         INSERT INTO projects 
-        (name, summary, start_date, created_by, target_end_date, created_on, label)
+        (name, summary, start_date, created_by, target_end_date, created_on, project_key)
         VALUES
         ($1, $2, $3, $4, $5, $6, $7)
         ON CONFLICT DO NOTHING
@@ -139,7 +167,7 @@ async function seedProjects() {
         project.created_by,
         project.target_end_date,
         new Date().toISOString(),
-        project.label
+        project.project_key
       ])
       return rows[0]
     })
@@ -153,6 +181,7 @@ async function createTables() {
   await createUsersTable()
   await createProjectsTable()
   await createUsersProjectsTable()
+  await createIssuesTable()
 
 }
 async function seedTables() {
