@@ -39,6 +39,7 @@ export class ProjectsController {
     @Param('id', new ParseUUIDPipe({ version: '4' })) project_id: string,
     @Body() updateProjectDto: UpdateProjectDto,
   ) {
+    if (!Object.keys(updateProjectDto).length) return [];
     return await this.projectsService.update(project_id, updateProjectDto);
   }
 

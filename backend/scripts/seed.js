@@ -59,7 +59,7 @@ async function createIssuesTable() {
     id UUID DEFAULT uuid_generate_v4() NOT NULL PRIMARY KEY,
     issue_key TEXT NOT NULL,
     summary TEXT NOT NULL,
-    descrpition TEXT,
+    description TEXT,
     identified_date TEXT NOT NULL,
     related_project UUID NOT NULL REFERENCES projects(id),
     assigned_to UUID REFERENCES users(id),

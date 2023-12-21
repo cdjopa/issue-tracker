@@ -1,6 +1,7 @@
 import {
   Contains,
   IsDateString,
+  IsOptional,
   IsString,
   IsUUID,
   MaxLength,
@@ -13,12 +14,14 @@ export class CreateIssueDto {
 
   @IsString()
   @MaxLength(4000)
+  @IsOptional()
   description: string;
 
   @IsUUID()
   related_project: string;
 
-  @IsString()
+  @IsUUID()
+  @IsOptional()
   assigned_to: string;
 
   @IsString()
@@ -26,6 +29,7 @@ export class CreateIssueDto {
   @Contains('medium')
   @Contains('high')
   @Contains('urgent')
+  @IsOptional()
   priority: string;
 
   @IsString()
@@ -34,13 +38,15 @@ export class CreateIssueDto {
   @Contains('in_progress')
   @Contains('done')
   @Contains('cancelled')
+  @IsOptional()
   issue_type: string;
 
   @IsString()
   @IsDateString()
+  @IsOptional()
   target_resolution_date: string;
 
-  @IsString()
+  @IsUUID()
   created_by: string;
 }
 
