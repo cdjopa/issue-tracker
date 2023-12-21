@@ -1,7 +1,7 @@
 const { users } = require('../src/data/user.placeholder.js');
+const { projects } = require('../src/data/project.placeholder.js')
 const bcrypt = require('bcrypt');
 const { pool } = require('./db.js');
-const { error } = require('console');
 
 
 async function installExtensions() {
@@ -58,6 +58,7 @@ async function createProjectsTable() {
       CREATE TABLE IF NOT EXISTS projects (
         id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
         name TEXT UNIQUE NOT NULL,
+        label TEXT UNIQUE NOT NULL,
         summary TEXT UNIQUE NOT NULL,
         start_date TEXT NOT NULL,
         target_end_date TEXT NOT NULL,
@@ -121,6 +122,33 @@ async function seedUsers() {
   );
 }
 
+async function seedProjects() {
+  const insertedProjects = await Promise.all(
+    projects.map(async (project) => {
+      const { rows } = await pool.query(`
+        INSERT INTO projects 
+        (name, summary, start_date, created_by, target_end_date, created_on, label)
+        VALUES
+        ($1, $2, $3, $4, $5, $6, $7)
+        ON CONFLICT DO NOTHING
+        RETURNING projects.id
+      `, [
+        project.name,
+        project.summary,
+        project.start_date,
+        project.created_by,
+        project.target_end_date,
+        new Date().toISOString(),
+        project.label
+      ])
+      return rows[0]
+    })
+  )
+  console.log(
+    `Inserted ${insertedProjects.filter((project) => project).length} projects`
+  )
+}
+
 async function createTables() {
   await createUsersTable()
   await createProjectsTable()
@@ -129,6 +157,7 @@ async function createTables() {
 }
 async function seedTables() {
   await seedUsers();
+  await seedProjects();
 }
 
 async function seed() {

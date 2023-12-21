@@ -9,7 +9,7 @@ import { Project } from './entities/project.entity';
 export class ProjectsService {
   async create(createProjectDto: CreateProjectDto): Promise<UUID> {
     try {
-      const { name, summary, start_date, created_by, target_end_date } =
+      const { name, summary, start_date, created_by, target_end_date, label } =
         createProjectDto;
 
       const { rows } = await pool.query(
@@ -17,7 +17,7 @@ export class ProjectsService {
         INSERT INTO projects 
         (name, summary, start_date, created_by, target_end_date, created_on)
         VALUES
-        ($1, $2, $3, $4, $5, $6)
+        ($1, $2, $3, $4, $5, $6, $7)
         RETURNING projects.id
     `,
         [
@@ -27,6 +27,7 @@ export class ProjectsService {
           created_by,
           target_end_date,
           new Date().toISOString(),
+          label,
         ],
       );
       return rows[0];

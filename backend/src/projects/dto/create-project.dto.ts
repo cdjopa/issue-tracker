@@ -5,6 +5,9 @@ export class CreateProjectDto {
   name: string;
 
   @IsString()
+  label: string;
+
+  @IsString()
   summary: string;
 
   @IsDateString()

@@ -1,5 +1,6 @@
 export class Project {
   id: string;
+  label: string;
   name: string;
   summary: string;
   start_date: string;
