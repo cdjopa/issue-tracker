@@ -124,6 +124,7 @@ async function seedUsers() {
 async function createTables() {
   await createUsersTable()
   await createProjectsTable()
+  await createUsersProjectsTable()
 
 }
 async function seedTables() {

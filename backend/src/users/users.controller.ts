@@ -1,4 +1,4 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Controller, Get, Param, ParseUUIDPipe } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { Public } from 'src/metadata';
 import { UUID } from 'crypto';
@@ -21,10 +21,12 @@ export class UsersController {
   }
 
   @Get(':user_id/projects')
-  async getUserProjects(@Param() params: FindProjectsDto) {
+  async getUserProjects(
+    @Param('user_id', new ParseUUIDPipe({ version: '4' })) user_id: string,
+  ) {
     // TODO:
     // use user session to get id instead of passing in as param
-    const projects = await this.userService.findProjects(params.user_id);
+    const projects = await this.userService.findProjects(user_id);
     return projects;
   }
 }

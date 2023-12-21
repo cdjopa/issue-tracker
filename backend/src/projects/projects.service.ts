@@ -1,7 +1,7 @@
 import { ConsoleLogger, Injectable } from '@nestjs/common';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
-import { UUID } from 'crypto';
+import { UUID, getRandomValues } from 'crypto';
 import { pool } from 'src/db';
 import { Project } from './entities/project.entity';
 
@@ -46,7 +46,7 @@ export class ProjectsService {
     }
   }
 
-  async findOne(project_id: UUID): Promise<Project | undefined> {
+  async findOne(project_id: string): Promise<Project | undefined> {
     try {
       const { rows } = await pool.query(`SELECT * FROM projects WHERE id=$1`, [
         project_id,
@@ -58,11 +58,125 @@ export class ProjectsService {
     }
   }
 
-  update(project_id: UUID, updateProjectDto: UpdateProjectDto) {
-    return `This action updates a #${project_id} project`;
+  async update(project_id: string, updateProjectDto: UpdateProjectDto) {
+    const { name, summary, target_end_date, actual_end_date } =
+      updateProjectDto;
+    try {
+      const updateFields = Object.keys(updateProjectDto)
+        .map((key, idx) => {
+          return `${key} = $${idx + 2}`;
+        })
+        .join(', ');
+
+      const { rows } = await pool.query(
+        `
+      UPDATE projects 
+      SET ${updateFields}
+      WHERE projects.id = $1 
+      RETURNING projects.*
+      `,
+        [project_id, ...Object.values(updateProjectDto)],
+      );
+      return rows[0];
+    } catch (error) {
+      console.error('Error updating a project');
+      throw new Error(error);
+    }
   }
 
-  remove(project_id: UUID) {
-    return `This action removes a #${project_id} project`;
+  async remove(project_id: string) {
+    try {
+      const { rows } = await pool.query(
+        `
+        DELETE FROM projects WHERE id = $1
+        RETURNING projects.*
+        `,
+        [project_id],
+      );
+      return rows[0];
+    } catch (error) {
+      console.error('Error deleting a project');
+      throw new Error(error);
+    }
+  }
+  async getUsers(project_id: string) {
+    const { rows } = await pool.query(
+      `
+    SELECT user_id FROM users_projects WHERE project_id = $1
+    `,
+      [project_id],
+    );
+    return rows.map((values) => values.user_id);
+  }
+
+  async addUsers(project_id: string, users: string[]) {
+    // create client to allow use of transaction
+    const client = await pool.connect();
+    try {
+      // start postgres transaction
+      await client.query('BEGIN');
+      const inserted = await Promise.all(
+        // for every requested user, try inserting into the project
+        await users.map(async (user_id) => {
+          const { rows } = await client.query(
+            `INSERT INTO users_projects (project_id, user_id) VALUES ($1, $2)
+            ON CONFLICT DO NOTHING
+            RETURNING user_id
+             `,
+            [project_id, user_id],
+          );
+          // return all successful inserts
+          return rows[0];
+        }),
+      );
+      // reformat result to return array of successful insert user UUID
+      await client.query('COMMIT');
+      return inserted
+        .filter((values) => values && values.user_id)
+        .map((values) => values.user_id);
+    } catch (error) {
+      // undo partial inserts if some failed
+      client.query('ROLLBACK');
+      console.error('Error adding users to project');
+      throw new Error(error);
+    } finally {
+      // console.log('releasing client');
+      client.release();
+    }
+  }
+  async removeUsers(project_id: string, users: string[]) {
+    // create client to allow use of transaction
+    const client = await pool.connect();
+    try {
+      // start postgres transaction
+      await client.query('BEGIN');
+      const inserted = await Promise.all(
+        // for every requested user, try inserting into the project
+        await users.map(async (user_id) => {
+          const { rows } = await client.query(
+            `DELETE FROM users_projects 
+            WHERE user_id = $1 AND project_id = $2
+            RETURNING user_id
+             `,
+            [user_id, project_id],
+          );
+          // return all successful inserts
+          return rows[0];
+        }),
+      );
+      // reformat result to return array of successful insert user UUID
+      await client.query('COMMIT');
+      return inserted
+        .filter((values) => values && values.user_id)
+        .map((values) => values.user_id);
+    } catch (error) {
+      // undo partial inserts if some failed
+      client.query('ROLLBACK');
+      console.error('Error adding users to project');
+      throw new Error(error);
+    } finally {
+      // console.log('releasing client');
+      client.release();
+    }
   }
 }
