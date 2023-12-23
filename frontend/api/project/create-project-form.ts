@@ -4,17 +4,6 @@ import { redirect } from 'next/navigation';
 import { z } from 'zod';
 import { resolveErrors } from '../api';
 
-// type State = {
-//   errors?: {
-//     name?: string[];
-//     project_key?: string[];
-//     summary?: string[];
-//     start_date?: string[];
-//     target_end_date?: string[];
-//   };
-//   message?: string | null;
-// };
-
 const CreateProjectSchema = z.object({
   name: z.string().min(3, { message: 'Project name must contain at least (3)characters' }),
   project_key: z
