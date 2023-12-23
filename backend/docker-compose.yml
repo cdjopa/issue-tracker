@@ -6,12 +6,28 @@ services:
     image: postgres
     restart: always
     environment:
-      POSTGRES_PASSWORD: example
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
       - 5432:5432
+    volumes:
+      # create extensions
+      - ./sql/extensions.sql:/docker-entrypoint-initdb.d/1.exentions.sql
 
-  adminer:
-    image: adminer
-    restart: always
-    ports:
-      - 8080:8080
+      # create tables
+      - ./sql/tables/users.sql:/docker-entrypoint-initdb.d/2.tables.users.sql
+      - ./sql/tables/projects.sql:/docker-entrypoint-initdb.d/3.tables.projects.sql
+      - ./sql/tables/users_projects.sql:/docker-entrypoint-initdb.d/4.tables.users_projects.sql
+      - ./sql/tables/issues.sql:/docker-entrypoint-initdb.d/5.tables.issues.sql
+
+      # insert data
+      - ./sql/data/users.sql:/docker-entrypoint-initdb.d/6.data.users.sql
+      - ./sql/data/projects.sql:/docker-entrypoint-initdb.d/7.data.projects.sql
+      - ./sql/data/users_projects.sql:/docker-entrypoint-initdb.d/8.data.users_projects.sql
+      - ./sql/data/issues.sql:/docker-entrypoint-initdb.d/9.data.issues.sql
+
+  # adminer:
+  #   image: adminer
+  #   restart: always
+  #   ports:
+  #     - 8080:8080

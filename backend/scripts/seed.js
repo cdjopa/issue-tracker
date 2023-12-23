@@ -186,7 +186,7 @@ async function createTables() {
 }
 async function seedTables() {
   await seedUsers();
-  await seedProjects();
+  // await seedProjects();
 }
 
 async function seed() {
