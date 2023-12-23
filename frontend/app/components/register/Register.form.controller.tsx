@@ -19,7 +19,6 @@ export default function RegisterFormController() {
       form.validate();
       return;
     }
-
   };
 
   return (
@@ -28,5 +27,3 @@ export default function RegisterFormController() {
     </form>
   );
 }
-
-
